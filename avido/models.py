@@ -1,73 +1,65 @@
 from django.db import models
-from users.models import userProfile
+from users.models import UserProfile
+from .choices import *
 
-# Create your models here.
+
+class CommonInfo(models.Model):
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        abstract = True
 
 
-class Category(models.Model):
-    category_name = models.TextField(null=False)
-    category_code = models.IntegerField(unique=True)
+class Category(CommonInfo):
+    name = models.CharField(max_length=30, null=True)
+    code = models.IntegerField(unique=True)
     description = models.TextField(blank=True)
-    parent_category = models.ForeignKey(
+    parent = models.ForeignKey(
         'self', blank=True, on_delete=models.SET_NULL, null=True)
-    created_at = models.DateTimeField(auto_now_add=True)
-    updated_at = models.DateTimeField(auto_now=True)
 
     def __str__(self):
-        return self.category_name
+        return str(self.name)
 
 
-class Region(models.Model):
-    region_name = models.TextField(blank=False, null=False)
-    created_at = models.DateTimeField(auto_now_add=True)
-    updated_at = models.DateTimeField(auto_now=True)
+class Region(CommonInfo):
+    name = models.CharField(max_length=40, blank=False, null=True)
 
     def __str__(self):
-        return self.region_name
+        return str(self.name)
 
 
-class Cities(models.Model):
-    city_name = models.TextField(blank=False, null=False)
-    Region = models.ForeignKey(Region, on_delete=models.SET_NULL, null=True)
-    created_at = models.DateTimeField(auto_now_add=True)
-    updated_at = models.DateTimeField(auto_now=True)
+class Cities(CommonInfo):
+    name = models.CharField(max_length=30, blank=False, null=True)
+    region = models.ForeignKey(Region, on_delete=models.SET_NULL, null=True)
 
     def __str__(self):
-        return self.city_name
+        return str(self.name)
 
 
-class Announcement(models.Model):
-    class State(models.TextChoices):
-     # Actual value ↓      # ↓ Displayed on Django Admin
-        Draft = 'Draft', 'Draft'
-        Moderate = "Moderate", "Moderate"
-        Rejected = "Rejected", "Rejected"
-        Active = 'Active', 'Active'
+class Announcement(CommonInfo):
 
-    name = models.TextField(blank=False)
+    name = models.CharField(max_length=250, blank=False)
     category = models.ForeignKey(
         Category, on_delete=models.SET_NULL, null=True)
     description = models.TextField(blank=True)
-    publication_date = models.DateField
+    date = models.DateField
     city = models.ForeignKey(Cities, on_delete=models.SET_NULL, null=True)
     cost = models.CharField(max_length=12, blank=False)
-    user_id = models.ForeignKey(userProfile, on_delete=models.CASCADE)
+    user = models.ForeignKey(UserProfile, on_delete=models.CASCADE)
     views = models.IntegerField
-    announce_state = models.CharField(max_length=20, choices=State.choices)
+    state = models.CharField(
+        max_length=20, choices=AnnouncmentState.CHOICES, default=AnnouncmentState.draft)
     image = models.ImageField(upload_to='images/%Y/%m/%d/', blank=True)
-    created_at = models.DateTimeField(auto_now_add=True)
-    updated_at = models.DateTimeField(auto_now=True)
 
     def __str__(self):
-        return self.name
+        return str(self.name)
 
 
-class announceModeration(models.Model):
+class AnnounceModeration(CommonInfo):
     moderator = models.ForeignKey(
-        userProfile, on_delete=models.SET_DEFAULT, default=1)
-    announce_id = models.ForeignKey(Announcement, on_delete=models.CASCADE)
-    date_modertion = models.DateField
+        UserProfile, on_delete=models.SET_DEFAULT, default=1)
+    announce = models.ForeignKey(Announcement, on_delete=models.CASCADE)
+    date = models.DateField
     publication = models.BooleanField(default=False)
     reason = models.TextField(blank=True, null=True)
-    created_at = models.DateTimeField(auto_now_add=True)
-    updated_at = models.DateTimeField(auto_now=True)
