@@ -1,5 +1,5 @@
 from django.db import models
-from users.models import UserProfile
+from users.models import User
 from .choices import *
 
 
@@ -46,7 +46,7 @@ class Announcement(CommonInfo):
     date = models.DateField
     city = models.ForeignKey(Cities, on_delete=models.SET_NULL, null=True)
     cost = models.CharField(max_length=12, blank=False)
-    user = models.ForeignKey(UserProfile, on_delete=models.CASCADE)
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
     views = models.IntegerField
     state = models.CharField(
         max_length=20, choices=AnnouncmentState.CHOICES, default=AnnouncmentState.draft)
@@ -58,7 +58,7 @@ class Announcement(CommonInfo):
 
 class AnnounceModeration(CommonInfo):
     moderator = models.ForeignKey(
-        UserProfile, on_delete=models.SET_DEFAULT, default=1)
+        User, on_delete=models.SET_DEFAULT, default=1)
     announce = models.ForeignKey(Announcement, on_delete=models.CASCADE)
     date = models.DateField
     publication = models.BooleanField(default=False)

@@ -131,3 +131,10 @@ STATIC_URL = 'static/'
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 MEDIA_ROOT = BASE_DIR/'media/'
+
+AUTH_USER_MODEL = 'users.User'
+
+AUTHENTICATION_BACKENDS = ['users.backends.EmailBackend']
+
+LOGIN_REDIRECT_URL = '/users/profile'
+LOGOUT_REDIRECT_URL = "/users/login"
