@@ -37,7 +37,6 @@ class UserManager(BaseUserManager):
         return self._create_user(email, password, **extra_fields)
 
 
-
 class User(AbstractBaseUser, PermissionsMixin):
 
     email = models.EmailField(_('email'), unique=True)
@@ -45,6 +44,12 @@ class User(AbstractBaseUser, PermissionsMixin):
     first_name = models.CharField(_('name'), max_length=50, blank=True)
     last_name = models.CharField(_('surname'), max_length=50, blank=True)
     date_joined = models.DateTimeField(_('registered'), auto_now_add=True)
+    state = models.CharField(choices=UserState.CHOICES,
+                             default=UserState.waiting, max_length=10)
+    call_time = models.TextField(blank=True)
+    PhoneNumberRegex = RegexValidator(regex=r"^\+?1?\d{11}$")
+    phone = models.CharField(
+        validators=[PhoneNumberRegex], max_length=12, unique=True, blank=True, null=True)
     is_active = models.BooleanField(_('is_active'), default=True)
     is_staff = models.BooleanField(default=False)
 

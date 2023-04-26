@@ -21,6 +21,9 @@ class LoginView(auth_views.LoginView):
     form_class = LoginForm
     template_name = 'users/login.html'
 
+class LogoutView(auth_views.LogoutView):
+    pass
+
 
 class RegisterView(generic.CreateView):
     form_class = RegisterForm
