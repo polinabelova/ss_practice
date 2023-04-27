@@ -1,7 +1,7 @@
 from django.db import models
 from django.contrib.auth.models import User
 from django.core.validators import RegexValidator
-from .choices import *
+from .choices import UserState
 from django.contrib.auth.models import AbstractBaseUser, BaseUserManager, AbstractUser
 from django.contrib.auth.models import PermissionsMixin
 from django.core.mail import send_mail
@@ -40,7 +40,7 @@ class UserManager(BaseUserManager):
 class User(AbstractBaseUser, PermissionsMixin):
 
     email = models.EmailField(_('email'), unique=True)
-    username = models.CharField(max_length=150)
+    
     first_name = models.CharField(_('name'), max_length=50, blank=True)
     last_name = models.CharField(_('surname'), max_length=50, blank=True)
     date_joined = models.DateTimeField(_('registered'), auto_now_add=True)
@@ -79,4 +79,5 @@ class User(AbstractBaseUser, PermissionsMixin):
         '''
         Отправляет электронное письмо этому пользователю.
         '''
+        print(subject, message, from_email, [self.email], **kwargs)
         send_mail(subject, message, from_email, [self.email], **kwargs)

@@ -138,3 +138,11 @@ AUTHENTICATION_BACKENDS = ['users.backends.EmailBackend']
 
 LOGIN_REDIRECT_URL = '/users/profile'
 LOGOUT_REDIRECT_URL = "/users/login"
+
+
+EMAIL_USE_TLS = True
+EMAIL_HOST = 'smtp.gmail.com'
+EMAIL_PORT = 587
+EMAIL_HOST_USER = os.getenv('EMAIL_HOST_USER')
+EMAIL_HOST_PASSWORD = os.getenv('EMAIL_HOST_PASSWORD')
+DEFAULT_FROM_EMAIL = 'Avido'
