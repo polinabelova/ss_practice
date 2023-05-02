@@ -58,7 +58,7 @@ class RegisterView(generic.CreateView):
         )
         return redirect('email_confirmation_sent')
 
-# Потверждение почты при авторизации
+# Подтверждение почты при авторизации
 # Проверка пользователя по токену
 
 
