@@ -1,18 +1,19 @@
 from django.views import generic
 from django.shortcuts import render, redirect
 from django.views import View
-from .forms import RegisterForm, LoginForm
-from .choices import UserState
+from django.contrib.auth.forms import PasswordResetForm, SetPasswordForm
+from django.contrib.messages.views import SuccessMessageMixin
 from django.urls import reverse_lazy
 from django.views.generic.base import TemplateView
 from django.contrib.auth import views as auth_views
+from django.contrib.auth.views import PasswordResetView, PasswordResetConfirmView
 from django.core.mail import send_mail
 from django.utils.http import urlsafe_base64_encode, urlsafe_base64_decode
 from django.utils.encoding import force_bytes
 from .token import account_activation_token
 from .models import User
-
-
+from .choices import UserState
+from .forms import RegisterForm, LoginForm, UserPasswordResetForm
 # Create your views here.
 
 
@@ -57,8 +58,10 @@ class RegisterView(generic.CreateView):
         )
         return redirect('email_confirmation_sent')
 
-
+# Потверждение почты при авторизации
 # Проверка пользователя по токену
+
+
 class UserConfirmEmailView(View):
 
     def get(self, request, uidb64, token):
@@ -78,6 +81,7 @@ class UserConfirmEmailView(View):
             return redirect('email_confirmation_failed')
 
 
+# Успешная отправка письма для активации на почту
 class EmailConfirmationSentView(TemplateView):
     template_name = 'users/email_confirmation_sent.html'
 
@@ -86,6 +90,8 @@ class EmailConfirmationSentView(TemplateView):
         context['title'] = 'Письмо активации отправлено'
         return context
 
+# Ошибка проверки пользователя по токену
+
 
 class EmailConfirmationFailedView(TemplateView):
     template_name = 'users/email_confirmation_failed.html'
@@ -93,4 +99,38 @@ class EmailConfirmationFailedView(TemplateView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context['title'] = 'Ваш электронный адрес не активирован'
+        return context
+
+# Восстановление пароля
+
+
+class UserForgotPasswordView(SuccessMessageMixin, PasswordResetView):
+    """
+    Представление по сбросу пароля по почте
+    """
+    form_class = UserPasswordResetForm
+    template_name = 'users/user_password_reset.html'
+    success_url = reverse_lazy('login')
+    # success_message = 'Письмо с инструкцией по восстановлению пароля отправлено на ваш email'
+    subject_template_name = 'users/subject_password_reset_email.txt'
+    email_template_name = 'users/acc_password_reset_email.html'
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['title'] = 'Запрос на восстановление пароля'
+        return context
+
+
+class UserPasswordResetConfirmView(SuccessMessageMixin, PasswordResetConfirmView):
+    """
+    Представление установки нового пароля
+    """
+    form_class = SetPasswordForm
+    template_name = 'users/user_password_set.html'
+    success_url = reverse_lazy('login')
+    # success_message = 'Пароль успешно изменен. Можете авторизоваться на сайте.'
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['title'] = 'Установить новый пароль'
         return context
