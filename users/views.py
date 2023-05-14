@@ -18,18 +18,21 @@ from .forms import RegisterForm, LoginForm, UserPasswordResetForm
 # Create your views here.
 
 
-def index(request):
-    return render(request, "users/index.html")
+class IndexView(TemplateView):
+    template_name = "users/index.html"
 
 
-def profile(request):
-    return render(request, "users/profile.html")
+class ProfileView(TemplateView):
+    template_name = "users/profile.html"
+
 
 class UserAccountView(TemplateView):
     template_name = 'users/user_account.html'
 
+
 class ModeratorAccountView(TemplateView):
     template_name = 'users/moderator_account.html'
+
 
 class AdminAccountView(TemplateView):
     template_name = 'users/admin_account.html'
@@ -38,7 +41,6 @@ class AdminAccountView(TemplateView):
 class LoginView(auth_views.LoginView):
     form_class = LoginForm
     template_name = 'users/login.html'
-
 
     def get_redirect_url(self):
         redirect_url = super().get_redirect_url()
@@ -52,22 +54,8 @@ class LoginView(auth_views.LoginView):
         # else:
         #     redirect_url = ('/users')
         return redirect_url
+
     
-
-    # def user_redirect(self, form):
-    #     email = form.cleaned_data.get("username")
-    #     user = User.objects.get(email==email)
-        
-    #     if user.groups.filter(name='User').exists():
-    #         return redirect('/profile')
-            # template = 'users/user_account.html'
-            # print(user.email)
-            # self.redirect_field_name = "/profile"
-            
-
-
-        
-
 
 
 class LogoutView(auth_views.LogoutView):
@@ -126,10 +114,6 @@ class UserConfirmEmailView(View):
 class EmailConfirmationSentView(TemplateView):
     template_name = 'users/email_confirmation_sent.html'
 
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        context['title'] = 'Письмо активации отправлено'
-        return context
 
 # Ошибка проверки пользователя по токену
 
@@ -137,10 +121,6 @@ class EmailConfirmationSentView(TemplateView):
 class EmailConfirmationFailedView(TemplateView):
     template_name = 'users/email_confirmation_failed.html'
 
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        context['title'] = 'Ваш электронный адрес не активирован'
-        return context
 
 # Восстановление пароля
 
@@ -156,11 +136,6 @@ class UserForgotPasswordView(SuccessMessageMixin, PasswordResetView):
     subject_template_name = 'users/subject_password_reset_email.txt'
     email_template_name = 'users/acc_password_reset_email.html'
 
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        context['title'] = 'Запрос на восстановление пароля'
-        return context
-
 
 class UserPasswordResetConfirmView(SuccessMessageMixin, PasswordResetConfirmView):
     """
@@ -169,9 +144,4 @@ class UserPasswordResetConfirmView(SuccessMessageMixin, PasswordResetConfirmView
     form_class = SetPasswordForm
     template_name = 'users/user_password_set.html'
     success_url = reverse_lazy('login')
-    # success_message = 'Пароль успешно изменен. Можете авторизоваться на сайте.'
-
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        context['title'] = 'Установить новый пароль'
-        return context
+    

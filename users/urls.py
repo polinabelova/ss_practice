@@ -2,8 +2,8 @@ from django.urls import path
 from .views import *
 urlpatterns = [
 
-    path('', index, name="users"),
-    path('profile', profile, name="profile"),
+    path('', IndexView.as_view(), name="users"),
+    path('profile', ProfileView.as_view(), name="profile"),
     path('user-account/', UserAccountView.as_view(), name='user_account'),
     path('moderator-account/', ModeratorAccountView.as_view(), name='moderator_account'),
     path('admin-account/', AdminAccountView.as_view(), name='admin_account'),
