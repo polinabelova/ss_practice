@@ -136,7 +136,7 @@ AUTH_USER_MODEL = 'users.User'
 
 AUTHENTICATION_BACKENDS = ['users.backends.EmailBackend']
 
-LOGIN_REDIRECT_URL = '/users/profile'
+# LOGIN_REDIRECT_URL = '/users/profile'
 LOGOUT_REDIRECT_URL = "/users/login"
 
 

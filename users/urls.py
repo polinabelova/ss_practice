@@ -4,6 +4,9 @@ urlpatterns = [
 
     path('', index, name="users"),
     path('profile', profile, name="profile"),
+    path('user-account/', UserAccountView.as_view(), name='user_account'),
+    path('moderator-account/', ModeratorAccountView.as_view(), name='moderator_account'),
+    path('admin-account/', AdminAccountView.as_view(), name='admin_account'),
     path('login/', LoginView.as_view(), name='login'),
     path('logout/', LogoutView.as_view(), name='logout'),
     path('register/', RegisterView.as_view(), name='register'),

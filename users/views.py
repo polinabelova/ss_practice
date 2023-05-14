@@ -2,6 +2,7 @@ from django.views import generic
 from django.shortcuts import render, redirect
 from django.views import View
 from django.contrib.auth.forms import PasswordResetForm, SetPasswordForm
+from django.contrib.auth.models import Group
 from django.contrib.messages.views import SuccessMessageMixin
 from django.urls import reverse_lazy
 from django.views.generic.base import TemplateView
@@ -24,10 +25,49 @@ def index(request):
 def profile(request):
     return render(request, "users/profile.html")
 
+class UserAccountView(TemplateView):
+    template_name = 'users/user_account.html'
+
+class ModeratorAccountView(TemplateView):
+    template_name = 'users/moderator_account.html'
+
+class AdminAccountView(TemplateView):
+    template_name = 'users/admin_account.html'
+
 
 class LoginView(auth_views.LoginView):
     form_class = LoginForm
     template_name = 'users/login.html'
+
+
+    def get_redirect_url(self):
+        redirect_url = super().get_redirect_url()
+        user = self.request.user
+        if user.groups.filter(name='User').exists():
+            redirect_url = ('/users/user-account')
+        elif user.groups.filter(name='Moderator').exists():
+            redirect_url = ('/users/moderator-account')
+        elif user.groups.filter(name='Admin').exists():
+            redirect_url = ('/users/admin-account')
+        # else:
+        #     redirect_url = ('/users')
+        return redirect_url
+    
+
+    # def user_redirect(self, form):
+    #     email = form.cleaned_data.get("username")
+    #     user = User.objects.get(email==email)
+        
+    #     if user.groups.filter(name='User').exists():
+    #         return redirect('/profile')
+            # template = 'users/user_account.html'
+            # print(user.email)
+            # self.redirect_field_name = "/profile"
+            
+
+
+        
+
 
 
 class LogoutView(auth_views.LogoutView):
@@ -75,6 +115,7 @@ class UserConfirmEmailView(View):
             user.is_active = True
             user.state = UserState.active
             user.save()
+            user.groups.add(Group.objects.get(name='User'))
 
             return redirect('/users/login/')
         else:
