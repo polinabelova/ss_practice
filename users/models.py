@@ -1,18 +1,14 @@
 from django.db import models
 from django.contrib.auth.models import User
 from django.core.validators import RegexValidator
-from .choices import UserState
-from django.contrib.auth.models import AbstractBaseUser, BaseUserManager, AbstractUser, Group
-from django.contrib.auth.models import PermissionsMixin
+from django.contrib.auth.models import AbstractBaseUser, BaseUserManager, PermissionsMixin
 from django.core.mail import send_mail
 from django.utils.translation import gettext_lazy as _
+from .choices import UserState
 
 
 class UserManager(BaseUserManager):
     use_in_migrations = True
-
-    # users_gr = Group.objects.create(name='Test')
-    # users_gr.save()
 
     def _create_user(self, email, password, **extra_fields):
         """
@@ -43,7 +39,6 @@ class UserManager(BaseUserManager):
 class User(AbstractBaseUser, PermissionsMixin):
 
     email = models.EmailField(_('email'), unique=True)
-    
     first_name = models.CharField(_('name'), max_length=50, blank=True)
     last_name = models.CharField(_('surname'), max_length=50, blank=True)
     date_joined = models.DateTimeField(_('registered'), auto_now_add=True)

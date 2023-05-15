@@ -1,13 +1,12 @@
-from django.views import generic
-from django.shortcuts import render, redirect
-from django.views import View
+from django.views import generic, View
+from django.views.generic.base import TemplateView
 from django.contrib.auth.forms import PasswordResetForm, SetPasswordForm
 from django.contrib.auth.models import Group
 from django.contrib.messages.views import SuccessMessageMixin
-from django.urls import reverse_lazy
-from django.views.generic.base import TemplateView
 from django.contrib.auth import views as auth_views
 from django.contrib.auth.views import PasswordResetView, PasswordResetConfirmView
+from django.urls import reverse_lazy
+from django.shortcuts import render, redirect
 from django.core.mail import send_mail
 from django.utils.http import urlsafe_base64_encode, urlsafe_base64_decode
 from django.utils.encoding import force_bytes
@@ -15,7 +14,6 @@ from .token import account_activation_token
 from .models import User
 from .choices import UserState
 from .forms import RegisterForm, LoginForm, UserPasswordResetForm
-# Create your views here.
 
 
 class IndexView(TemplateView):
@@ -51,11 +49,10 @@ class LoginView(auth_views.LoginView):
             redirect_url = ('/users/moderator-account')
         elif user.groups.filter(name='Admin').exists():
             redirect_url = ('/users/admin-account')
-        # else:
-        #     redirect_url = ('/users')
+        # временно
+        else:
+            redirect_url = ('/users')
         return redirect_url
-
-    
 
 
 class LogoutView(auth_views.LogoutView):
@@ -89,7 +86,6 @@ class RegisterView(generic.CreateView):
 # Подтверждение почты при авторизации
 # Проверка пользователя по токену
 
-
 class UserConfirmEmailView(View):
 
     def get(self, request, uidb64, token):
@@ -116,15 +112,11 @@ class EmailConfirmationSentView(TemplateView):
 
 
 # Ошибка проверки пользователя по токену
-
-
 class EmailConfirmationFailedView(TemplateView):
     template_name = 'users/email_confirmation_failed.html'
 
 
 # Восстановление пароля
-
-
 class UserForgotPasswordView(SuccessMessageMixin, PasswordResetView):
     """
     Представление по сбросу пароля по почте
@@ -132,7 +124,6 @@ class UserForgotPasswordView(SuccessMessageMixin, PasswordResetView):
     form_class = UserPasswordResetForm
     template_name = 'users/user_password_reset.html'
     success_url = reverse_lazy('login')
-    # success_message = 'Письмо с инструкцией по восстановлению пароля отправлено на ваш email'
     subject_template_name = 'users/subject_password_reset_email.txt'
     email_template_name = 'users/acc_password_reset_email.html'
 
@@ -144,4 +135,3 @@ class UserPasswordResetConfirmView(SuccessMessageMixin, PasswordResetConfirmView
     form_class = SetPasswordForm
     template_name = 'users/user_password_set.html'
     success_url = reverse_lazy('login')
-    

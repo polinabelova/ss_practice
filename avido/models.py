@@ -1,6 +1,6 @@
 from django.db import models
 from users.models import User
-from .choices import *
+from .choices import AnnouncmentState
 
 
 class CommonInfo(models.Model):

@@ -23,5 +23,3 @@ class UserPasswordResetForm(PasswordResetForm):
             self.add_error('email', msg)
 
         return email
-
-    
